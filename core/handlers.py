@@ -39,13 +39,21 @@ class DifyAiCardBotHandler(ChatbotHandler):
         if incoming_message.message_type != "text":
             self.reply_text("对不起，我目前只看得懂文字喔~", incoming_message)
             return AckMessage.STATUS_OK, "OK"
+        custom_template_name = incoming_message.text.content.upper()
+        custom_template_id = os.getenv(custom_template_name)
 
         # 在企业开发者后台配置的卡片模版id https://open-dev.dingtalk.com/fe/card
         card_template_id = os.getenv("DINGTALK_AI_CARD_TEMPLATE_ID")
         content_key = "content"
         card_data = {content_key: ""}
         card_instance = AICardReplier(self.dingtalk_client, incoming_message)
-        # 先投放卡片
+        
+        # 如果存在custom_template_id，直接投放卡片并返回
+        if custom_template_id:
+            card_instance.create_and_send_card(custom_template_id, card_data)
+            return AckMessage.STATUS_OK, "OK"
+            
+        # 否则先投放卡片，再进行流式更新
         card_instance_id = card_instance.create_and_send_card(card_template_id, card_data, callback_type="STREAM")
         # 再流式更新卡片
         try:
