@@ -40,7 +40,9 @@ class DifyAiCardBotHandler(ChatbotHandler):
             self.reply_text("对不起，我目前只看得懂文字喔~", incoming_message)
             return AckMessage.STATUS_OK, "OK"
         custom_template_name = incoming_message.text.content.upper()
+        logger.info(f"custom_template_name: {custom_template_name}")
         custom_template_id = os.getenv(custom_template_name)
+        logger.info(f"custom_template_id: {custom_template_id}")
 
         # 在企业开发者后台配置的卡片模版id https://open-dev.dingtalk.com/fe/card
         card_template_id = os.getenv("DINGTALK_AI_CARD_TEMPLATE_ID")
